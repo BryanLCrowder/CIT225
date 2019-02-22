@@ -61,7 +61,7 @@ CREATE TABLE price
 ( price_id           NUMBER      CONSTRAINT nn_price_table_1 NOT NULL
 , item_id            NUMBER      CONSTRAINT nn_price_table_2 NOT NULL
 , price_type         NUMBER      
-, active_flag        VARCHAR2(1) CONSTRAINT yn_price NOT NULL CHECK (active_flag in ('Y', 'N'))
+, active_flag        VARCHAR2(1) CONSTRAINT nn_price_table_3 NOT NULL 
 , start_date         DATE        CONSTRAINT nn_price_table_4 NOT NULL
 , end_date           DATE        
 , amount             NUMBER      CONSTRAINT nn_price_table_5 NOT NULL
@@ -73,7 +73,8 @@ CREATE TABLE price
 , CONSTRAINT fk_price_table_1    FOREIGN KEY(item_id)         REFERENCES item(item_id)
 , CONSTRAINT fk_price_table_2    FOREIGN KEY(price_type)      REFERENCES common_lookup(common_lookup_id)
 , CONSTRAINT fk_price_table_3    FOREIGN KEY(created_by)      REFERENCES system_user(system_user_id)
-, CONSTRAINT fk_price_table_4    FOREIGN KEY(last_updated_by) REFERENCES system_user(system_user_id));
+, CONSTRAINT fk_price_table_4    FOREIGN KEY(last_updated_by) REFERENCES system_user(system_user_id)
+, CONSTRAINT yn_price CHECK (active_flag in ('Y', 'N')));
 
 SET NULL ''
 COLUMN table_name   FORMAT A14
@@ -158,7 +159,7 @@ VALUES
   WHERE    common_lookup_context = 'ITEM'
   AND      common_lookup_type = 'DVD_WIDE_SCREEN')
 ,'Tron'
-,''
+, NULL
 ,'PG'
 ,(TRUNC(SYSDATE) - 1)
 , 1001
@@ -187,7 +188,7 @@ VALUES
   WHERE    common_lookup_context = 'ITEM'
   AND      common_lookup_type = 'DVD_WIDE_SCREEN')
 ,'Enders Game'
-,''
+, NULL
 ,'PG'
 ,(TRUNC(SYSDATE) - 1)
 , 1001
@@ -216,7 +217,7 @@ VALUES
   WHERE    common_lookup_context = 'ITEM'
   AND      common_lookup_type = 'DVD_WIDE_SCREEN')
 ,'Elysium'
-,''
+, NULL
 ,'PG'
 ,(TRUNC(SYSDATE) - 1)
 , 1001
@@ -314,7 +315,7 @@ VALUES
 ,(SELECT   common_lookup_id
   FROM     common_lookup
   WHERE    common_lookup_type = 'HOME')           -- address_type
-,'Prove'                                       -- city
+,'Provo'                                       -- city
 ,'Utah'                                             -- state_province
 ,'84604'                                          -- postal_code
 ,(SELECT   system_user_id
@@ -430,7 +431,7 @@ VALUES
 ,(SELECT   common_lookup_id
   FROM     common_lookup
   WHERE    common_lookup_type = 'HOME')           -- address_type
-,'Prove'                                       -- city
+,'Provo'                                       -- city
 ,'Utah'                                             -- state_province
 ,'84604'                                          -- postal_code
 ,(SELECT   system_user_id
@@ -548,7 +549,7 @@ VALUES
 ,(SELECT   common_lookup_id
   FROM     common_lookup
   WHERE    common_lookup_type = 'HOME')           -- address_type
-,'Prove'                                       -- city
+,'Provo'                                       -- city
 ,'Utah'                                             -- state_province
 ,'84604'                                          -- postal_code
 ,(SELECT   system_user_id
@@ -640,7 +641,7 @@ ON       a.address_id = sa.address_id INNER JOIN telephone t
 ON       c.contact_id = t.contact_id
 WHERE    c.last_name = 'Potter';
 
---PART 4 STEP D
+--PART 3 STEP D
 
 INSERT INTO rental
 ( rental_id
@@ -730,10 +731,9 @@ VALUES
 ,(SELECT   i.item_id
   FROM     item i
   ,        common_lookup cl
-  WHERE    i.item_title = 'Star Wars I'
-  AND      i.item_subtitle = 'Phantom Menace'
+  WHERE    i.item_title = 'I Remember Mama'
   AND      i.item_type = cl.common_lookup_id
-  AND      cl.common_lookup_type = 'DVD_WIDE_SCREEN')
+  AND      cl.common_lookup_type = 'BLU-RAY')
 , 1001
 , SYSDATE
 , 1001
@@ -758,8 +758,7 @@ VALUES
 ,(SELECT   i.item_id
   FROM     item i
   ,        common_lookup cl
-  WHERE    i.item_title = 'Star Wars II'
-  AND      i.item_subtitle = 'Attack of the Clones'
+  WHERE    i.item_title = 'Elysium'
   AND      i.item_type = cl.common_lookup_id
   AND      cl.common_lookup_type = 'DVD_WIDE_SCREEN')
 , 1001
@@ -787,8 +786,7 @@ VALUES
 ,(SELECT   i.item_id
   FROM     item i
   ,        common_lookup cl
-  WHERE    i.item_title = 'Star Wars III'
-  AND      i.item_subtitle = 'Revenge of the Sith'
+  WHERE    i.item_title = 'Tron'
   AND      i.item_type = cl.common_lookup_id
   AND      cl.common_lookup_type = 'DVD_WIDE_SCREEN')
 , 1001
@@ -816,10 +814,9 @@ VALUES
 ,(SELECT   d.item_id
   FROM     item d
   ,        common_lookup cl
-  WHERE    d.item_title = 'I Remember Mama'
-  AND      d.item_subtitle IS NULL
+  WHERE    d.item_title = 'Enders Game'
   AND      d.item_type = cl.common_lookup_id
-  AND      cl.common_lookup_type = 'BLU-RAY')
+  AND      cl.common_lookup_type = 'DVD_WIDE_SCREEN')
 , 1001
 , SYSDATE
 , 1001
@@ -1063,6 +1060,8 @@ AND      uc.constraint_type IN (UPPER('c'),UPPER('p'))
 ORDER BY uc.constraint_type DESC
 ,        uc.constraint_name;
 
+--part e
+
 CREATE UNIQUE INDEX common_lookup_u2
   ON common_lookup(common_lookup_table,common_lookup_column,common_lookup_type);
 
@@ -1080,7 +1079,7 @@ WHERE    UI.table_name = UPPER('common_lookup')
 ORDER BY UI.index_name
 ,        uic.column_position;
 
---part e
+--part f
 
 UPDATE telephone
 SET    telephone_type =
@@ -1130,8 +1129,4 @@ GROUP BY cl.common_lookup_table
 ,        cl.common_lookup_column
 ,        cl.common_lookup_type;
        
-       
-       
-       
-
 SPOOL OFF
